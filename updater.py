@@ -14,7 +14,6 @@ class Updater(chainer.training.StandardUpdater):
         self._lrdecay_start = params['lrdecay_start']
         self._lrdecay_period = params['lrdecay_period']
         self._image_size = params['image_size']
-        self._eval_foler = params['eval_folder']
         self._dataset = params['dataset']
         self._iter = 0
         self._max_buffer_size = 50
@@ -101,11 +100,8 @@ class Updater(chainer.training.StandardUpdater):
         batch_x = self.get_iterator('main').next()
         batch_y = self.get_iterator('train_B').next()
 
-        w_in = self._image_size
         x = Variable(self.converter(batch_x, self.device))
         y = Variable(self.converter(batch_y, self.device))
-
-        # TODO If we use update buffer, it is more difficult to add task specific loss?
 
         x_y = self.gen_g(x)
         x_y_copy = self.getAndUpdateBufferX(x_y.data)

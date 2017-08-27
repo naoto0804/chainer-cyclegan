@@ -23,8 +23,8 @@ def main():
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--out', '-o', default='result',
                         help='Directory to output the result')
-    parser.add_argument('--eval_folder', '-e', default='test',
-                        help='Directory to output the evaluation result')
+    parser.add_argument('--vis_folder', '-e', default='visualization',
+                        help='Directory to output the visualization result')
 
     parser.add_argument('--eval_interval', type=int, default=1000,
                         help='Interval of evaluating generator')
@@ -99,8 +99,8 @@ def main():
         serializers.load_npz(args.load_dis_y_model, dis_y)
         print("Discriminator Y model loaded")
 
-    if not os.path.exists(args.eval_folder):
-        os.makedirs(args.eval_folder)
+    if not os.path.exists(args.vis_folder):
+        os.makedirs(args.vis_folder)
 
     # select GPU
     if args.gpu >= 0:
@@ -156,7 +156,6 @@ def main():
             'lambda1': args.lambda1,
             'lambda2': args.lambda2,
             'image_size': args.crop_to,
-            'eval_folder': args.eval_folder,
             'lrdecay_start': args.lrdecay_start,
             'lrdecay_period': args.lrdecay_period,
             'dataset': train_A_dataset
@@ -189,7 +188,7 @@ def main():
                 trigger=(100, 'iteration'), file_name='loss.png'))
 
     trainer.extend(
-        visualize(gen_g, gen_f, args.eval_folder),
+        visualize(gen_g, gen_f, args.vis_folder),
         trigger=(1, 'epoch')
     )
 
