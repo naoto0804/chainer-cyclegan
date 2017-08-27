@@ -1,7 +1,39 @@
+import random
+
 import chainer
 import chainer.functions as F
-import numpy as np
 from chainer import Variable
+
+
+class ImagePool():
+    def __init__(self, pool_size):
+        self.pool_size = pool_size
+        if self.pool_size > 0:
+            self.num_imgs = 0
+            self.images = []
+
+    def query(self, images):
+        if self.pool_size == 0:
+            return images
+        return_images = []
+        xp = chainer.cuda.get_array_module(images)
+        for image in images:
+            image = xp.expand_dims(image, axis=0)
+            if self.num_imgs < self.pool_size:
+                self.num_imgs = self.num_imgs + 1
+                self.images.append(image)
+                return_images.append(image)
+            else:
+                p = random.uniform(0, 1)
+                if p > 0.5:
+                    random_id = random.randint(0, self.pool_size - 1)
+                    tmp = xp.copy(self.images[random_id])
+                    self.images[random_id] = image
+                    return_images.append(tmp)
+                else:
+                    return_images.append(image)
+        return_images = xp.concatenate(return_images)
+        return return_images
 
 
 class Updater(chainer.training.StandardUpdater):
@@ -15,49 +47,12 @@ class Updater(chainer.training.StandardUpdater):
         self._lrdecay_period = params['lrdecay_period']
         self._image_size = params['image_size']
         self._dataset = params['dataset']
+        self._batch_size = params['batch_size']
         self._iter = 0
-        self._max_buffer_size = 50
         self.xp = self.gen_g.xp
-        self._buffer_x = self.xp.zeros(
-            (self._max_buffer_size, 3, self._image_size,
-             self._image_size)).astype("f")
-        self._buffer_y = self.xp.zeros(
-            (self._max_buffer_size, 3, self._image_size,
-             self._image_size)).astype("f")
+        self._buffer_x = ImagePool(50 * self._batch_size)
+        self._buffer_y = ImagePool(50 * self._batch_size)
         self.init_alpha = self.get_optimizer('gen_g').alpha
-
-    def getAndUpdateBufferX(self, data):
-        if self._iter < self._max_buffer_size:
-            self._buffer_x[self._iter, :] = data[0]
-            return data
-
-        self._buffer_x[0:self._max_buffer_size - 2, :] = self._buffer_x[
-                                                         1:self._max_buffer_size - 1,
-                                                         :]
-        self._buffer_x[self._max_buffer_size - 1, :] = data[0]
-
-        if np.random.rand() < 0.5:
-            return data
-        id = np.random.randint(0, self._max_buffer_size)
-        return self._buffer_x[id, :].reshape(
-            (1, 3, self._image_size, self._image_size))
-
-    def getAndUpdateBufferY(self, data):
-
-        if self._iter < self._max_buffer_size:
-            self._buffer_y[self._iter, :] = data[0]
-            return data
-
-        self._buffer_y[0:self._max_buffer_size - 2, :] = self._buffer_y[
-                                                         1:self._max_buffer_size - 1,
-                                                         :]
-        self._buffer_y[self._max_buffer_size - 1, :] = data[0]
-
-        if np.random.rand() < 0.5:
-            return data
-        id = np.random.randint(0, self._max_buffer_size)
-        return self._buffer_y[id, :].reshape(
-            (1, 3, self._image_size, self._image_size))
 
     def loss_func_rec_l1(self, x_out, t):
         return F.mean_absolute_error(x_out, t)
@@ -104,12 +99,12 @@ class Updater(chainer.training.StandardUpdater):
         y = Variable(self.converter(batch_y, self.device))
 
         x_y = self.gen_g(x)
-        x_y_copy = self.getAndUpdateBufferX(x_y.data)
+        x_y_copy = self._buffer_y.query(x_y.data)
         x_y_copy = Variable(x_y_copy)
         x_y_x = self.gen_f(x_y)
 
         y_x = self.gen_f(y)
-        y_x_copy = self.getAndUpdateBufferY(y_x.data)
+        y_x_copy = self._buffer_x.query(y_x.data)
         y_x_copy = Variable(y_x_copy)
         y_x_y = self.gen_g(y_x)
 

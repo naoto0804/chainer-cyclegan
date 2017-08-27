@@ -155,6 +155,7 @@ def main():
         params={
             'lambda1': args.lambda1,
             'lambda2': args.lambda2,
+            'batch_size': args.batch_size,
             'image_size': args.crop_to,
             'lrdecay_start': args.lrdecay_start,
             'lrdecay_period': args.lrdecay_period,
