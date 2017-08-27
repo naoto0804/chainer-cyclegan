@@ -49,7 +49,8 @@ if __name__ == '__main__':
     img = np.expand_dims(img, axis=0)
     img = xp.asarray(img)
 
-    out = gen(img)
+    with chainer.using_config('train', False):
+        out = gen(img)
     out = resize(xp.asnumpy(out.data[0]), (height, width))
     out = (out + 1.0) / 2.0 * 255.0
 

@@ -61,7 +61,8 @@ if __name__ == '__main__':
     cnt = 0
     for batch in iterator:
         imgs = chainer.dataset.concat_examples(batch, device=args.gpu)
-        out = xp.asnumpy(gen(imgs).data)
+        with chainer.using_config('train', False):
+            out = xp.asnumpy(gen(imgs).data)
         for i in range(len(out)):
             path = '{:s}/{:s}.jpg'.format(args.out, dataset.ids[cnt])
             arr = (out[i] + 1.0) / 2.0 * 255.0
