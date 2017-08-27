@@ -10,15 +10,14 @@ from chainer.training import extensions
 
 import net as net
 from dataset import Dataset
-from visualization import visualize
 from updater import Updater
+from visualization import visualize
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', default='datasets')
     parser.add_argument('--batch_size', '-b', type=int, default=1)
-    parser.add_argument('--max_iter', '-m', type=int, default=120000)
     parser.add_argument('--gpu', '-g', type=int, default=0,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--out', '-o', default='result',
@@ -73,7 +72,6 @@ def main():
     print(args)
 
     root = args.root
-    max_iter = args.max_iter
 
     if args.gpu >= 0:
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -164,7 +162,8 @@ def main():
 
     log_interval = (20, 'iteration')
     model_save_interval = (5000, 'iteration')
-    trainer = training.Trainer(updater, (max_iter, 'iteration'), out=args.out)
+    trainer = training.Trainer(updater, (
+        args.lrdecay_start + args.lrdecay_period, 'epoch'), out=args.out)
     trainer.extend(extensions.snapshot_object(
         gen_g, 'gen_g{.updater.iteration}.npz'), trigger=model_save_interval)
     trainer.extend(extensions.snapshot_object(
