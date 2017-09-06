@@ -61,7 +61,7 @@ def main():
                         help='resize the image to')
     parser.add_argument("--crop_to", type=int, default=256,
                         help='crop the resized image to')
-    parser.add_argument("--load_dataset", default='horse2zebra',
+    parser.add_argument("--load_dataset", default=None,
                         help='load dataset')
     parser.add_argument("--discriminator_layer_n", type=int, default=5,
                         help='number of discriminator layers')
@@ -122,11 +122,12 @@ def main():
     opt_x = make_optimizer(dis_x, alpha=args.learning_rate_d)
     opt_y = make_optimizer(dis_y, alpha=args.learning_rate_d)
 
+    train_dir = root if args.load_dataset is None else os.path.join(args.load_dataset)
     train_A_dataset = Dataset(
-        path=os.path.join(root, args.load_dataset, 'trainA'), flip=args.flip,
+        path=os.path.join(train_dir, 'trainA'), flip=args.flip,
         resize_to=args.resize_to, crop_to=args.crop_to)
     train_B_dataset = Dataset(
-        path=os.path.join(root, args.load_dataset, 'trainB'), flip=args.flip,
+        path=os.path.join(train_dir, 'trainB'), flip=args.flip,
         resize_to=args.resize_to, crop_to=args.crop_to)
 
     # train_A_iter = chainer.iterators.MultiprocessIterator(
