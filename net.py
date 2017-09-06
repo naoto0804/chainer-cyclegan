@@ -71,6 +71,8 @@ class CBR(chainer.Chain):
                     self.norm = InstanceNormalization(ch1, use_gamma=False)
                 else:
                     self.norm = InstanceNormalization(ch1)
+            else:
+                raise ValueError('invalid norm parameter for CBR')
 
     def __call__(self, x):
         if self.sample == "down" or self.sample == "none" or self.sample == 'none-9' or self.sample == 'none-7' or self.sample == 'none-5':

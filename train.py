@@ -47,7 +47,7 @@ def main():
                         help='Default generator class')
     parser.add_argument('--dis_class', default='Discriminator',
                         help='Default discriminator class')
-    parser.add_argument('--norm', default='norm',
+    parser.add_argument('--norm', default='instance',
                         help='normalization type. instance or batch')
 
     parser.add_argument("--lambda1", type=float, default=10.0,
