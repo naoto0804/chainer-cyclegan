@@ -44,7 +44,6 @@ class CBR(chainer.Chain):
     def __init__(self, ch0, ch1, ksize=3, pad=1, norm='instance', sample='down',
                  activation=F.relu, dropout=False, noise=False):
         super(CBR, self).__init__()
-        self.norm = norm
         self.activation = activation
         self.dropout = dropout
         self.sample = sample
