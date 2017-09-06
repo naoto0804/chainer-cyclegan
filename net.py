@@ -92,23 +92,23 @@ class CBR(chainer.Chain):
 
 
 class Generator(chainer.Chain):
-    def __init__(self, n_resblock=9):
+    def __init__(self, norm='instance', n_resblock=9):
         super(Generator, self).__init__()
         self.n_resblock = n_resblock
         with self.init_scope():
             # nn.ReflectionPad2d in original
-            self.c1 = CBR(3, 32, bn=True, sample='none-7')
-            self.c2 = CBR(32, 64, bn=True, sample='down')
-            self.c3 = CBR(64, 128, bn=True, sample='down')
+            self.c1 = CBR(3, 32, norm=norm, sample='none-7')
+            self.c2 = CBR(32, 64, norm=norm, sample='down')
+            self.c3 = CBR(64, 128, norm=norm, sample='down')
             for i in range(n_resblock):
-                setattr(self, 'c' + str(i + 4), ResBlock(128, bn=True))
+                setattr(self, 'c' + str(i + 4), ResBlock(128, norm=norm))
             # nn.ConvTranspose2d in original
             setattr(self, 'c' + str(n_resblock + 4),
-                    CBR(128, 64, bn=True, sample='up'))
+                    CBR(128, 64, norm=norm, sample='up'))
             setattr(self, 'c' + str(n_resblock + 5),
-                    CBR(64, 32, bn=True, sample='up'))
+                    CBR(64, 32, norm=norm, sample='up'))
             setattr(self, 'c' + str(n_resblock + 6),
-                    CBR(32, 3, bn=True, sample='none-7', activation=F.tanh))
+                    CBR(32, 3, norm=norm, sample='none-7', activation=F.tanh))
 
     def __call__(self, x):
         h = self.c1(x)
@@ -132,14 +132,14 @@ class Discriminator(chainer.Chain):
 
             for i in range(1, n_down_layers):
                 setattr(self, 'c' + str(i),
-                        CBR(base, base * 2, ksize=ksize, pad=pad, bn=True,
+                        CBR(base, base * 2, ksize=ksize, pad=pad, norm=norm,
                             sample='down',
                             activation=F.leaky_relu, dropout=False,
                             noise=False))
                 base *= 2
 
             setattr(self, 'c' + str(n_down_layers),
-                    CBR(base, base * 2, ksize=ksize, pad=pad, bn=True,
+                    CBR(base, base * 2, ksize=ksize, pad=pad, norm=norm,
                         sample='none',
                         activation=F.leaky_relu, dropout=False,
                         noise=False))
