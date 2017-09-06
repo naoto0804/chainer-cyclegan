@@ -122,7 +122,8 @@ def main():
     opt_x = make_optimizer(dis_x, alpha=args.learning_rate_d)
     opt_y = make_optimizer(dis_y, alpha=args.learning_rate_d)
 
-    train_dir = root if args.load_dataset is None else os.path.join(args.load_dataset)
+    train_dir = root if args.load_dataset is None else os.path.join(
+        args.load_dataset)
     train_A_dataset = Dataset(
         path=os.path.join(train_dir, 'trainA'), flip=args.flip,
         resize_to=args.resize_to, crop_to=args.crop_to)

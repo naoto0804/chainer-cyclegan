@@ -1,1 +1,1 @@
-from .link import InstanceNormalization ## NOQA
+from .link import InstanceNormalization  # NOQA

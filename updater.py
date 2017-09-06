@@ -114,8 +114,8 @@ class Updater(chainer.training.StandardUpdater):
         loss_cycle_x = self._lambda1 * self.loss_func_rec_l1(x_y_x, x)
         loss_cycle_y = self._lambda1 * self.loss_func_rec_l1(y_x_y, y)
         loss_gen = self._lambda2 * loss_gen_g_adv + \
-                   self._lambda2 * loss_gen_f_adv + \
-                   loss_cycle_x + loss_cycle_y
+            self._lambda2 * loss_gen_f_adv + \
+            loss_cycle_x + loss_cycle_y
         self.gen_f.cleargrads()
         self.gen_g.cleargrads()
         loss_gen.backward()

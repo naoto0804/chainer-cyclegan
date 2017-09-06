@@ -6,7 +6,8 @@ from chainer import initializers
 from chainer import link
 from chainer import variable
 
-import function
+from .function import fixed_instance_normalization
+from .function import InstanceNormalizationFunction
 
 
 class InstanceNormalization(link.Link):
@@ -68,10 +69,10 @@ class InstanceNormalization(link.Link):
         if (not configuration.config.train) and self.valid_test:
             mean = variable.Variable(self.avg_mean)
             var = variable.Variable(self.avg_var)
-            ret = function.fixed_instance_normalization(
+            ret = fixed_instance_normalization(
                 x, gamma, beta, mean, var, self.eps)
         else:
-            func = function.InstanceNormalizationFunction(
+            func = InstanceNormalizationFunction(
                 self.eps, self.avg_mean, self.avg_var, decay)
             ret = func(x, gamma, beta)
             self.avg_mean = func.running_mean
