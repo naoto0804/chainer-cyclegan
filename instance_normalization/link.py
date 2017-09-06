@@ -12,6 +12,7 @@ import function
 class InstanceNormalization(link.Link):
 
     """Instance normalization layer on outputs of convolution functions.
+
     It is recommended to use this normalization instead of batch normalization
     in generative models of what we call Style Transfer.
     """

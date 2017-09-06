@@ -1,6 +1,8 @@
 import argparse
 from datetime import datetime as dt
 import os
+import matplotlib
+matplotlib.use('Agg')
 
 import chainer
 from chainer import serializers

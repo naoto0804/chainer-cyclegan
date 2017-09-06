@@ -1,1 +1,1 @@
-from link import InstanceNormalization  # NOQA
+import link.InstanceNormalization as InstanceNormalization  # NOQA

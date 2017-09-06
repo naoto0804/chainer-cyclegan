@@ -25,6 +25,7 @@ def _xhat(x, mean, std, expander):
 class InstanceNormalizationFunction(function.Function):
 
     """Instance Normalization function.
+
     This is similar to Batch Normalization, however, different
     in that this function does not require running_mean nor running_var
     and mean and variance are calculated for each tensor in mini batch.
