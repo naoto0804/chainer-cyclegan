@@ -18,7 +18,7 @@ from visualization import visualize
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', default='datasets')
-    parser.add_argument('--batch_size', '-b', type=int, default=1)
+    parser.add_argument('--batch_size', '-b', type=int, default=8)
     parser.add_argument('--gpu', '-g', type=int, default=0,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--out', '-o', default='result',
@@ -131,15 +131,16 @@ def main():
         path=os.path.join(train_dir, 'trainB'), flip=args.flip,
         resize_to=args.resize_to, crop_to=args.crop_to)
 
-    # train_A_iter = chainer.iterators.MultiprocessIterator(
-    #     train_A_dataset, args.batch_size, n_processes=4)
-    # train_B_iter = chainer.iterators.MultiprocessIterator(
-    #     train_B_dataset, args.batch_size, n_processes=4)
-
-    train_A_iter = chainer.iterators.SerialIterator(
-        train_A_dataset, args.batch_size)
-    train_B_iter = chainer.iterators.SerialIterator(
-        train_B_dataset, args.batch_size)
+    if args.batch_size > 1:
+        train_A_iter = chainer.iterators.MultiprocessIterator(
+            train_A_dataset, args.batch_size, n_processes=3)
+        train_B_iter = chainer.iterators.MultiprocessIterator(
+            train_B_dataset, args.batch_size, n_processes=3)
+    else:
+        train_A_iter = chainer.iterators.SerialIterator(
+            train_A_dataset, args.batch_size)
+        train_B_iter = chainer.iterators.SerialIterator(
+            train_B_dataset, args.batch_size)
 
     # Set up a trainer
     updater = Updater(
