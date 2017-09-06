@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
-
 import argparse
+from datetime import datetime as dt
 import os
 
 import chainer
@@ -8,7 +7,7 @@ from chainer import serializers
 from chainer import training
 from chainer.training import extensions
 
-import net as net
+import net
 from dataset import Dataset
 from updater import Updater
 from visualization import visualize
@@ -46,6 +45,8 @@ def main():
                         help='Default generator class')
     parser.add_argument('--dis_class', default='Discriminator',
                         help='Default discriminator class')
+    parser.add_argument('--norm', default='norm',
+                        help='normalization type. instance or batch')
 
     parser.add_argument("--lambda1", type=float, default=10.0,
                         help='lambda for reconstruction loss')
@@ -76,10 +77,10 @@ def main():
     if args.gpu >= 0:
         chainer.cuda.get_device_from_id(args.gpu).use()
 
-    gen_g = getattr(net, args.gen_class)()
-    dis_x = getattr(net, args.dis_class)()
-    gen_f = getattr(net, args.gen_class)()
-    dis_y = getattr(net, args.dis_class)()
+    gen_g = getattr(net, args.gen_class)(args.norm)
+    dis_x = getattr(net, args.dis_class)(args.norm)
+    gen_f = getattr(net, args.gen_class)(args.norm)
+    dis_y = getattr(net, args.dis_class)(args.norm)
 
     if args.load_gen_g_model != '':
         serializers.load_npz(args.load_gen_g_model, gen_g)
@@ -162,8 +163,9 @@ def main():
 
     log_interval = (20, 'iteration')
     model_save_interval = (5000, 'iteration')
+    out = os.path.join(args.out, dt.now().strftime('%m%d_%H%M'))
     trainer = training.Trainer(updater, (
-        args.lrdecay_start + args.lrdecay_period, 'epoch'), out=args.out)
+        args.lrdecay_start + args.lrdecay_period, 'epoch'), out=out)
     trainer.extend(extensions.snapshot_object(
         gen_g, 'gen_g{.updater.iteration}.npz'), trigger=model_save_interval)
     trainer.extend(extensions.snapshot_object(

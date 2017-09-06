@@ -5,6 +5,8 @@ import chainer.functions as F
 import chainer.links as L
 from chainer import cuda
 
+from instance_normalization import InstanceNormalization
+
 
 def add_noise(h, sigma=0.2):
     xp = cuda.get_array_module(h.data)
@@ -15,33 +17,34 @@ def add_noise(h, sigma=0.2):
 
 
 class ResBlock(chainer.Chain):
-    def __init__(self, ch, bn=True, activation=F.relu):
+    def __init__(self, ch, norm='instance', activation=F.relu):
         super(ResBlock, self).__init__()
-        self.bn = bn
         self.activation = activation
         w = chainer.initializers.Normal(0.02)
         with self.init_scope():
             self.c0 = L.Convolution2D(ch, ch, 3, 1, 1, initialW=w)
             self.c1 = L.Convolution2D(ch, ch, 3, 1, 1, initialW=w)
-            self.bn0 = L.BatchNormalization(ch)
-            self.bn1 = L.BatchNormalization(ch)
+            if norm == 'batch':
+                self.norm0 = L.BatchNormalization(ch)
+                self.norm1 = L.BatchNormalization(ch)
+            elif norm == 'instance':
+                self.norm0 = InstanceNormalization(ch)
+                self.norm1 = InstanceNormalization(ch)
 
     def __call__(self, x):
         h = self.c0(x)
-        if self.bn:
-            h = self.bn0(h)
+        h = self.norm0(h)
         h = self.activation(h)
         h = self.c1(h)
-        if self.bn:
-            h = self.bn1(h)
+        h = self.norm1(h)
         return h + x
 
 
 class CBR(chainer.Chain):
-    def __init__(self, ch0, ch1, ksize=3, pad=1, bn=True, sample='down',
+    def __init__(self, ch0, ch1, ksize=3, pad=1, norm='instance', sample='down',
                  activation=F.relu, dropout=False, noise=False):
         super(CBR, self).__init__()
-        self.bn = bn
+        self.norm = norm
         self.activation = activation
         self.dropout = dropout
         self.sample = sample
@@ -59,11 +62,16 @@ class CBR(chainer.Chain):
                 self.c = L.Convolution2D(ch0, ch1, 5, 1, 2, initialW=w)
             else:
                 self.c = L.Convolution2D(ch0, ch1, ksize, 1, pad, initialW=w)
-            if bn:
+            if norm == 'batch':
                 if self.noise:
-                    self.batchnorm = L.BatchNormalization(ch1, use_gamma=False)
+                    self.norm = L.BatchNormalization(ch1, use_gamma=False)
                 else:
-                    self.batchnorm = L.BatchNormalization(ch1)
+                    self.norm = L.BatchNormalization(ch1)
+            elif norm == 'instance':
+                if self.noise:
+                    self.norm = InstanceNormalization(ch1, use_gamma=False)
+                else:
+                    self.norm = InstanceNormalization(ch1)
 
     def __call__(self, x):
         if self.sample == "down" or self.sample == "none" or self.sample == 'none-9' or self.sample == 'none-7' or self.sample == 'none-5':
@@ -73,8 +81,7 @@ class CBR(chainer.Chain):
             h = self.c(h)
         else:
             print("unknown sample method %s" % self.sample)
-        if self.bn:
-            h = self.batchnorm(h)
+        h = self.norm(h)
         if self.noise:
             h = add_noise(h)
         if self.dropout:
@@ -111,7 +118,7 @@ class Generator(chainer.Chain):
 
 
 class Discriminator(chainer.Chain):
-    def __init__(self, in_ch=3, n_down_layers=3):
+    def __init__(self, norm='instance', in_ch=3, n_down_layers=3):
         super(Discriminator, self).__init__()
         base = 64
         ksize = 4
@@ -119,7 +126,7 @@ class Discriminator(chainer.Chain):
         self.n_down_layers = n_down_layers
 
         with self.init_scope():
-            self.c0 = CBR(in_ch, 64, ksize=ksize, pad=pad, bn=False,
+            self.c0 = CBR(in_ch, 64, ksize=ksize, pad=pad, norm=norm,
                           sample='down', activation=F.leaky_relu,
                           dropout=False, noise=False)
 
@@ -139,7 +146,7 @@ class Discriminator(chainer.Chain):
             base *= 2
 
             setattr(self, 'c' + str(n_down_layers + 1),
-                    CBR(base, 1, ksize=ksize, pad=pad, bn=False, sample='none',
+                    CBR(base, 1, ksize=ksize, pad=pad, norm=norm, sample='none',
                         activation=None, dropout=False, noise=False))
 
     def __call__(self, x_0):
