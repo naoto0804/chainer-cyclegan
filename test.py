@@ -53,7 +53,7 @@ if __name__ == '__main__':
     gen = getattr(net, args.gen_class)()
 
     if args.load_gen_model != '':
-        serializers.load_npz(args.load_gen_f_model, gen)
+        serializers.load_npz(args.load_gen_model, gen)
         print("Generator F model loaded")
 
     if args.gpu >= 0:
