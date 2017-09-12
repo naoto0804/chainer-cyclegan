@@ -14,14 +14,15 @@ except ImportError:
     available = False
 from chainercv.transforms import resize
 
-import net
-from config import root
 from dataset import Dataset
+import net
+
 
 if __name__ == '__main__':
     if not available:
         print('`write_image` not in this chainercv\n')
     parser = argparse.ArgumentParser()
+    parser.add_argument('--root', default='datasets')
     parser.add_argument('--batch_size', '-b', type=int, default=8)
     parser.add_argument('--gpu', '-g', type=int, default=0,
                         help='GPU ID (negative value indicates CPU)')
@@ -35,11 +36,13 @@ if __name__ == '__main__':
                         help='resize the image to')
     parser.add_argument("--crop_to", type=int, default=256,
                         help='crop the resized image to')
-    parser.add_argument("--load_dataset", default='horse2zebra/testA',
+    parser.add_argument("--load_dataset", default=None,
                         help='load dataset')
-
+    parser.add_argument("--category", default="A", type=str,
+                        help="select A or B (A/B indicates trainA/B respectively")
     args = parser.parse_args()
     print(args)
+    root = args.root
 
     if args.gpu >= 0:
         chainer.cuda.get_device_from_id(args.gpu).use()
@@ -57,9 +60,13 @@ if __name__ == '__main__':
         gen.to_gpu()
         print("use gpu {}".format(args.gpu))
 
-    dataset = Dataset(
-        path=os.path.join(root, args.load_dataset), resize_to=args.resize_to,
-        crop_to=args.crop_to, flip=False)
+    if args.load_dataset is None:
+        data_dir = root
+    else:
+        data_dir = os.path.join(root, args.load_dataset)
+    data_dir = os.path.join(data_dir, "train{}".format(args.category.upper()))
+    dataset = Dataset(path=data_dir, resize_to=args.resize_to,
+                      crop_to=args.crop_to, flip=False)
 
     iterator = chainer.iterators.SerialIterator(dataset, args.batch_size,
                                                 repeat=False, shuffle=False)
