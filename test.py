@@ -6,7 +6,12 @@ import os
 import chainer.cuda
 from chainer import serializers
 from chainercv.utils import read_image
-from chainercv.utils import write_image
+try:
+    from chainercv.utils import write_image
+    available = True
+except ImportError:
+    from write_image import write_image
+    available = False
 from chainercv.transforms import resize
 
 import net
@@ -14,6 +19,8 @@ from config import root
 from dataset import Dataset
 
 if __name__ == '__main__':
+    if not available:
+        print('`write_image` not in this chainercv\n')
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', '-b', type=int, default=8)
     parser.add_argument('--gpu', '-g', type=int, default=0,
