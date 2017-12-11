@@ -41,7 +41,8 @@ class ResBlock(chainer.Chain):
 
 
 class CBR(chainer.Chain):
-    def __init__(self, ch0, ch1, ksize=3, pad=1, norm='instance', sample='down',
+    def __init__(self, ch0, ch1, ksize=3, pad=1, norm='instance',
+                 sample='down',
                  activation=F.relu, dropout=False, noise=False):
         super(CBR, self).__init__()
         self.activation = activation
@@ -49,6 +50,7 @@ class CBR(chainer.Chain):
         self.sample = sample
         self.noise = noise
         w = chainer.initializers.Normal(0.02)
+        self.use_norm = False if norm is None else True
 
         with self.init_scope():
             if sample == 'down':
@@ -61,18 +63,16 @@ class CBR(chainer.Chain):
                 self.c = L.Convolution2D(ch0, ch1, 5, 1, 2, initialW=w)
             else:
                 self.c = L.Convolution2D(ch0, ch1, ksize, 1, pad, initialW=w)
-            if norm == 'batch':
+            if self.use_norm and norm == 'batch':
                 if self.noise:
                     self.norm = L.BatchNormalization(ch1, use_gamma=False)
                 else:
                     self.norm = L.BatchNormalization(ch1)
-            elif norm == 'instance':
+            elif self.use_norm and norm == 'instance':
                 if self.noise:
                     self.norm = InstanceNormalization(ch1, use_gamma=False)
                 else:
                     self.norm = InstanceNormalization(ch1)
-            else:
-                raise ValueError('invalid norm parameter for CBR')
 
     def __call__(self, x):
         if self.sample == "down" or self.sample == "none" or self.sample == 'none-9' or self.sample == 'none-7' or self.sample == 'none-5':
@@ -82,7 +82,8 @@ class CBR(chainer.Chain):
             h = self.c(h)
         else:
             print("unknown sample method %s" % self.sample)
-        h = self.norm(h)
+        if self.use_norm:
+            h = self.norm(h)
         if self.noise:
             h = add_noise(h)
         if self.dropout:
@@ -127,7 +128,7 @@ class Discriminator(chainer.Chain):
         self.n_down_layers = n_down_layers
 
         with self.init_scope():
-            self.c0 = CBR(in_ch, 64, ksize=ksize, pad=pad, norm=norm,
+            self.c0 = CBR(in_ch, 64, ksize=ksize, pad=pad, norm=None,
                           sample='down', activation=F.leaky_relu,
                           dropout=False, noise=False)
 
@@ -147,7 +148,8 @@ class Discriminator(chainer.Chain):
             base *= 2
 
             setattr(self, 'c' + str(n_down_layers + 1),
-                    CBR(base, 1, ksize=ksize, pad=pad, norm=norm, sample='none',
+                    CBR(base, 1, ksize=ksize, pad=pad, norm=None,
+                        sample='none',
                         activation=None, dropout=False, noise=False))
 
     def __call__(self, x_0):
