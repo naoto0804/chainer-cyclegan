@@ -18,7 +18,7 @@ from visualization import visualize
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', default='datasets')
-    parser.add_argument('--batch_size', '-b', type=int, default=8)
+    parser.add_argument('--batch_size', '-b', type=int, default=1)
     parser.add_argument('--gpu', '-g', type=int, default=0,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--out', '-o', default='result',
@@ -166,8 +166,8 @@ def main():
             'dataset': train_A_dataset
         })
 
-    log_interval = (20, 'iteration')
-    model_save_interval = (5000, 'iteration')
+    log_interval = (100, 'iteration')
+    model_save_interval = (10000, 'iteration')
     out = os.path.join(args.out, dt.now().strftime('%m%d_%H%M'))
     trainer = training.Trainer(updater, (
         args.lrdecay_start + args.lrdecay_period, 'epoch'), out=out)
