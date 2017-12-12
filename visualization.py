@@ -39,7 +39,7 @@ def visualize(gen_g, gen_f, test_image_folder):
 
         with chainer.using_config('train', False):
             y_x = gen_f(y)
-            y_x_y = gen_f(y_x)
+            y_x_y = gen_g(y_x)
 
         for i, var in enumerate([y, y_x, y_x_y]):
             imgs = postprocess(var)
