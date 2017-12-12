@@ -6,6 +6,7 @@ This implementation is based on [this](https://github.com/Aixile/chainer-cyclega
 ## Requirements
 - Python 3.5+
 - Chainer 2.0+
+- ChainerCV 0.7+
 - Numpy
 - Matplotlib
 
