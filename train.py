@@ -1,7 +1,9 @@
 import argparse
-from datetime import datetime as dt
 import os
+from datetime import datetime as dt
+
 import matplotlib
+
 matplotlib.use('Agg')
 
 import chainer

@@ -99,23 +99,21 @@ class Updater(chainer.training.StandardUpdater):
         y = Variable(self.converter(batch_y, self.device))
 
         x_y = self.gen_g(x)
-        x_y_copy = self._buffer_y.query(x_y.data)
-        x_y_copy = Variable(x_y_copy)
+        x_y_copy = Variable(self._buffer_y.query(x_y.data))
         x_y_x = self.gen_f(x_y)
 
         y_x = self.gen_f(y)
-        y_x_copy = self._buffer_x.query(y_x.data)
-        y_x_copy = Variable(y_x_copy)
+        y_x_copy = Variable(self._buffer_x.query(y_x.data))
         y_x_y = self.gen_g(y_x)
 
         loss_gen_g_adv = self.loss_func_adv_gen(self.dis_y(x_y))
         loss_gen_f_adv = self.loss_func_adv_gen(self.dis_x(y_x))
 
-        loss_cycle_x = self._lambda1 * self.loss_func_rec_l1(x_y_x, x)
-        loss_cycle_y = self._lambda1 * self.loss_func_rec_l1(y_x_y, y)
-        loss_gen = self._lambda2 * loss_gen_g_adv + \
-            self._lambda2 * loss_gen_f_adv + \
-            loss_cycle_x + loss_cycle_y
+        loss_cycle_x = self.loss_func_rec_l1(x_y_x, x)
+        loss_cycle_y = self.loss_func_rec_l1(y_x_y, y)
+        loss_gen = self._lambda2 * (loss_gen_g_adv + loss_gen_f_adv) \
+                   + self._lambda1 * (loss_cycle_x + loss_cycle_y)
+
         self.gen_f.cleargrads()
         self.gen_g.cleargrads()
         loss_gen.backward()
