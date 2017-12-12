@@ -75,13 +75,13 @@ class CBR(chainer.Chain):
                     self.norm = InstanceNormalization(ch1)
 
     def __call__(self, x):
-        if self.sample == "down" or self.sample == "none" or self.sample == 'none-9' or self.sample == 'none-7' or self.sample == 'none-5':
+        if self.sample in ['down', 'none', 'none-9', 'none-7', 'none-5']:
             h = self.c(x)
-        elif self.sample == "up":
+        elif self.sample == 'up':
             h = F.unpooling_2d(x, 2, 2, 0, cover_all=False)
             h = self.c(h)
         else:
-            print("unknown sample method %s" % self.sample)
+            print('unknown sample method %s' % self.sample)
         if self.use_norm:
             h = self.norm(h)
         if self.noise:

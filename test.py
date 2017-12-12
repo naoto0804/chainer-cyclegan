@@ -20,18 +20,18 @@ if __name__ == '__main__':
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--gen_class', '-c', default='Generator',
                         help='Default generator class')
-    parser.add_argument("--load_gen_model", default='',
+    parser.add_argument('--load_gen_model', default='',
                         help='load generator model')
     parser.add_argument('--out', '-o', default='output',
                         help='saved file name')
-    parser.add_argument("--resize_to", type=int, default=256,
+    parser.add_argument('--resize_to', type=int, default=256,
                         help='resize the image to')
-    parser.add_argument("--crop_to", type=int, default=256,
+    parser.add_argument('--crop_to', type=int, default=256,
                         help='crop the resized image to')
-    parser.add_argument("--load_dataset", default=None,
+    parser.add_argument('--load_dataset', default=None,
                         help='load dataset')
-    parser.add_argument("--category", default="A", type=str,
-                        help="select A or B (A/B indicates trainA/B respectively")
+    parser.add_argument('--category', default='A', type=str,
+                        help='select A or B (A/B indicates trainA/B respectively')
     args = parser.parse_args()
     print(args)
     root = args.root
@@ -46,17 +46,17 @@ if __name__ == '__main__':
 
     if args.load_gen_model != '':
         serializers.load_npz(args.load_gen_model, gen)
-        print("Generator F model loaded")
+        print('Generator F model loaded')
 
     if args.gpu >= 0:
         gen.to_gpu()
-        print("use gpu {}".format(args.gpu))
+        print('use gpu {}'.format(args.gpu))
 
     if args.load_dataset is None:
         data_dir = root
     else:
         data_dir = os.path.join(root, args.load_dataset)
-    data_dir = os.path.join(data_dir, "train{}".format(args.category.upper()))
+    data_dir = os.path.join(data_dir, 'train{}'.format(args.category.upper()))
     dataset = Dataset(path=data_dir, resize_to=args.resize_to,
                       crop_to=args.crop_to, flip=False)
 

@@ -24,7 +24,7 @@ class Dataset(dataset_mixin.DatasetMixin):
 
     def get_example(self, i):
         img = read_image(self.get_img_path(i))
-        img = img.astype("f")
+        img = img.astype('f')
         img = img * 2 / 255.0 - 1.0  # [-1, 1)
 
         img = resize(img, (self.resize_to, self.resize_to))
@@ -33,8 +33,3 @@ class Dataset(dataset_mixin.DatasetMixin):
         if self.flip:
             img = random_flip(img, x_random=True)
         return img
-
-    def save_image(self, img, path):
-        # img = (img + 1.0) * 255.0 / 2.0
-        # write_image(img, path)
-        pass

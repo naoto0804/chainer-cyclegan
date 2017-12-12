@@ -1,17 +1,15 @@
 import numpy
-
 from chainer import configuration
 from chainer import cuda
 from chainer import initializers
 from chainer import link
 from chainer import variable
 
-from .function import fixed_instance_normalization
 from .function import InstanceNormalizationFunction
+from .function import fixed_instance_normalization
 
 
 class InstanceNormalization(link.Link):
-
     """Instance normalization layer on outputs of convolution functions.
 
     It is recommended to use this normalization instead of batch normalization

@@ -1,6 +1,5 @@
 import numpy
 
-import chainer
 from chainer import configuration
 from chainer import cuda
 from chainer import function
@@ -23,7 +22,6 @@ def _xhat(x, mean, std, expander):
 
 
 class InstanceNormalizationFunction(function.Function):
-
     """Instance Normalization function.
 
     This is similar to Batch Normalization, however, different
@@ -31,7 +29,8 @@ class InstanceNormalizationFunction(function.Function):
     and mean and variance are calculated for each tensor in mini batch.
     """
 
-    def __init__(self, eps=2e-5, mean=None, var=None,  decay=0.9, valid_test=False):
+    def __init__(self, eps=2e-5, mean=None, var=None, decay=0.9,
+                 valid_test=False):
         self.running_mean = mean
         self.running_var = var
         self.eps = eps
@@ -124,7 +123,8 @@ class InstanceNormalizationFunction(function.Function):
         ggamma = (gy * self.x_hat).sum(axis=gamma_beta_axis)
         if xp is numpy:
             gx = (gamma / self.std)[mean_var_expander] * (
-                gy - (self.x_hat * ggamma[mean_var_expander] + gbeta[mean_var_expander]) / m)
+                    gy - (self.x_hat * ggamma[mean_var_expander] + gbeta[
+                mean_var_expander]) / m)
         else:
             inv_m = numpy.float32(1) / m
             gx = cuda.elementwise(
@@ -134,7 +134,8 @@ class InstanceNormalizationFunction(function.Function):
                 'gx = (gamma / std) * (gy - (x_hat * ggamma + gbeta) * \
                 inv_m)',
                 'bn_bwd')(gy, self.x_hat, gamma[expander],
-                          self.std[mean_var_expander], ggamma[mean_var_expander],
+                          self.std[mean_var_expander],
+                          ggamma[mean_var_expander],
                           gbeta[mean_var_expander], inv_m)
         return gx, ggamma, gbeta
 
