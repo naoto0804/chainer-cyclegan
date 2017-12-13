@@ -2,6 +2,5 @@
 models/*
 .idea
 result
-*.jpg
 
 /__pycache__/
