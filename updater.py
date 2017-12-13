@@ -83,7 +83,7 @@ class Updater(chainer.training.StandardUpdater):
         self._iter += 1
         if self.is_new_epoch and self.epoch >= self._lrdecay_start:
             decay_step = self.init_alpha / self._lrdecay_period
-            print("lr decay", decay_step)
+            print('lr decay', decay_step)
             if opt_g.alpha > decay_step:
                 opt_g.alpha -= decay_step
             if opt_f.alpha > decay_step:

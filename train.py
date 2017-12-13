@@ -31,18 +31,18 @@ def main():
     parser.add_argument('--eval_interval', type=int, default=1000,
                         help='Interval of evaluating generator')
 
-    parser.add_argument("--learning_rate_g", type=float, default=0.0002,
-                        help="Learning rate for generator")
-    parser.add_argument("--learning_rate_d", type=float, default=0.0002,
-                        help="Learning rate for discriminator")
+    parser.add_argument('--learning_rate_g', type=float, default=0.0002,
+                        help='Learning rate for generator')
+    parser.add_argument('--learning_rate_d', type=float, default=0.0002,
+                        help='Learning rate for discriminator')
 
-    parser.add_argument("--load_gen_f_model", default='',
+    parser.add_argument('--load_gen_f_model', default='',
                         help='load generator model')
-    parser.add_argument("--load_gen_g_model", default='',
+    parser.add_argument('--load_gen_g_model', default='',
                         help='load generator model')
-    parser.add_argument("--load_dis_x_model", default='',
+    parser.add_argument('--load_dis_x_model', default='',
                         help='load discriminator model')
-    parser.add_argument("--load_dis_y_model", default='',
+    parser.add_argument('--load_dis_y_model', default='',
                         help='load discriminator model')
 
     parser.add_argument('--gen_class', default='Generator',
@@ -52,25 +52,25 @@ def main():
     parser.add_argument('--norm', default='instance',
                         help='normalization type. instance or batch')
 
-    parser.add_argument("--lambda1", type=float, default=10.0,
+    parser.add_argument('--lambda1', type=float, default=10.0,
                         help='lambda for reconstruction loss')
-    parser.add_argument("--lambda2", type=float, default=1.0,
+    parser.add_argument('--lambda2', type=float, default=1.0,
                         help='lambda for adversarial loss')
 
-    parser.add_argument("--flip", type=int, default=1,
+    parser.add_argument('--flip', type=int, default=1,
                         help='flip images for data augmentation')
-    parser.add_argument("--resize_to", type=int, default=286,
+    parser.add_argument('--resize_to', type=int, default=286,
                         help='resize the image to')
-    parser.add_argument("--crop_to", type=int, default=256,
+    parser.add_argument('--crop_to', type=int, default=256,
                         help='crop the resized image to')
-    parser.add_argument("--load_dataset", default=None,
+    parser.add_argument('--load_dataset', default=None,
                         help='load dataset')
-    parser.add_argument("--discriminator_layer_n", type=int, default=5,
+    parser.add_argument('--discriminator_layer_n', type=int, default=5,
                         help='number of discriminator layers')
 
-    parser.add_argument("--lrdecay_start", type=float, default=100,
+    parser.add_argument('--lrdecay_start', type=float, default=100,
                         help='anneal the learning rate (by epoch)')
-    parser.add_argument("--lrdecay_period", type=int,
+    parser.add_argument('--lrdecay_period', type=int,
                         default=100, help='period to anneal the learning')
 
     args = parser.parse_args()
@@ -88,19 +88,19 @@ def main():
 
     if args.load_gen_g_model != '':
         serializers.load_npz(args.load_gen_g_model, gen_g)
-        print("Generator G(X->Y) model loaded")
+        print('Generator G(X->Y) model loaded')
 
     if args.load_gen_f_model != '':
         serializers.load_npz(args.load_gen_f_model, gen_f)
-        print("Generator F(Y->X) model loaded")
+        print('Generator F(Y->X) model loaded')
 
     if args.load_dis_x_model != '':
         serializers.load_npz(args.load_dis_x_model, dis_x)
-        print("Discriminator X model loaded")
+        print('Discriminator X model loaded')
 
     if args.load_dis_y_model != '':
         serializers.load_npz(args.load_dis_y_model, dis_y)
-        print("Discriminator Y model loaded")
+        print('Discriminator Y model loaded')
 
     if not os.path.exists(args.vis_folder):
         os.makedirs(args.vis_folder)
@@ -111,7 +111,7 @@ def main():
         gen_f.to_gpu()
         dis_x.to_gpu()
         dis_y.to_gpu()
-        print("use gpu {}".format(args.gpu))
+        print('use gpu {}'.format(args.gpu))
 
     # Setup an optimizer
     def make_optimizer(model, alpha=0.0002, beta1=0.5):

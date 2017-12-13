@@ -17,12 +17,12 @@ if __name__ == '__main__':
     parser.add_argument('--gpu', '-g', type=int, default=0,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--gen_class', '-c', default='Generator',
-                        help='Default gen erator class')
-    parser.add_argument("--load_gen_model", '-l', default='',
+                        help='Default generator class')
+    parser.add_argument('--load_gen_model', '-l', default='',
                         help='load generator model')
     parser.add_argument('--output', '-o', default='result.jpg',
                         help='output image path')
-    parser.add_argument("--base_size", '-s', type=int, default=256,
+    parser.add_argument('--base_size', '-s', type=int, default=256,
                         help='shorter edge length')
 
     args = parser.parse_args()
@@ -35,15 +35,15 @@ if __name__ == '__main__':
 
     if args.load_gen_model != '':
         serializers.load_npz(args.load_gen_model, gen)
-        print("Generator model loaded")
+        print('Generator model loaded')
 
     if args.gpu >= 0:
         gen.to_gpu()
-        print("use gpu {}".format(args.gpu))
+        print('use gpu {}'.format(args.gpu))
 
     xp = gen.xp
     img = read_image(args.input)
-    img = img.astype("f")
+    img = img.astype('f')
     img = img * 2 / 255.0 - 1.0  # [-1, 1)
     height, width = img.shape[1:]
     img = np.expand_dims(img, axis=0)
