@@ -22,6 +22,11 @@ Downloadable datasets are listed in `./datasets/download_cyclegan_dataset.sh`
 python train.py --load_dataset <dataset> --gpu <gpu>
 ```
 
+### Test for single image
+```
+python single_image_test.py <input_image> --gpu <gpu> --load_gen_model <trained_generator> --output <output_image>
+```
+
 ## References
 - [1]: JY. Zhu, et al. "Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks", in ICCV, 2017.
 - [2]: [Original implementation in pytorch](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
