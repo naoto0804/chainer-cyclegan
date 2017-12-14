@@ -52,10 +52,13 @@ def main():
     parser.add_argument('--norm', default='instance',
                         help='normalization type. instance or batch')
 
-    parser.add_argument('--lambda1', type=float, default=10.0,
-                        help='lambda for reconstruction loss')
-    parser.add_argument('--lambda2', type=float, default=1.0,
-                        help='lambda for adversarial loss')
+    parser.add_argument('--lambda_A', type=float, default=10.0,
+                        help='weight for cycle loss (A -> B -> A)')
+    parser.add_argument('--lambda_B', type=float, default=10.0,
+                        help='weight for cycle loss (B -> A -> B)')
+    # Note that this is different from original implementation
+    parser.add_argument('--lambda_identity', type=float, default=1.0,
+                        help='lambda for l1 loss to stop unnecessary changes')
 
     parser.add_argument('--flip', type=int, default=1,
                         help='flip images for data augmentation')
@@ -159,8 +162,9 @@ def main():
         },
         device=args.gpu,
         params={
-            'lambda1': args.lambda1,
-            'lambda2': args.lambda2,
+            'lambda_A': args.lambda_A,
+            'lambda_B': args.lambda_B,
+            'lambda_identity': args.lambda_identity,
             'batch_size': args.batch_size,
             'image_size': args.crop_to,
             'lrdecay_start': args.lrdecay_start,
