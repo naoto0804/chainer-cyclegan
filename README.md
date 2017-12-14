@@ -26,6 +26,10 @@ python train.py --load_dataset <dataset> --gpu <gpu>
 ```
 python single_image_test.py <input_image> --gpu <gpu> --load_gen_model <trained_generator> --output <output_image>
 ```
+left: input (horse), right: output (zebra)
+
+![input(horse)](input.jpg)
+![output (zebra)](result.jpg)
 
 ## References
 - [1]: JY. Zhu, et al. "Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks", in ICCV, 2017.
