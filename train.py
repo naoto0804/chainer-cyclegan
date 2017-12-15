@@ -71,7 +71,7 @@ def main():
     parser.add_argument('--discriminator_layer_n', type=int, default=5,
                         help='number of discriminator layers')
 
-    parser.add_argument('--lrdecay_start', type=float, default=100,
+    parser.add_argument('--lrdecay_start', type=int, default=100,
                         help='anneal the learning rate (by epoch)')
     parser.add_argument('--lrdecay_period', type=int,
                         default=100, help='period to anneal the learning')

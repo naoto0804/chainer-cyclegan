@@ -2,5 +2,5 @@
 models/*
 .idea
 result
-
+visualization
 /__pycache__/
