@@ -56,8 +56,9 @@ def main():
                         help='weight for cycle loss (A -> B -> A)')
     parser.add_argument('--lambda_B', type=float, default=10.0,
                         help='weight for cycle loss (B -> A -> B)')
+
     # Note that this is different from original implementation
-    parser.add_argument('--lambda_identity', type=float, default=1.0,
+    parser.add_argument('--lambda_identity', type=float, default=0.0,
                         help='lambda for l1 loss to stop unnecessary changes')
 
     parser.add_argument('--flip', type=int, default=1,
@@ -68,8 +69,6 @@ def main():
                         help='crop the resized image to')
     parser.add_argument('--load_dataset', default=None,
                         help='load dataset')
-    parser.add_argument('--discriminator_layer_n', type=int, default=5,
-                        help='number of discriminator layers')
 
     parser.add_argument('--lrdecay_start', type=int, default=100,
                         help='anneal the learning rate (by epoch)')
