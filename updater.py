@@ -109,10 +109,14 @@ class Updater(chainer.training.StandardUpdater):
 
         loss_cycle_x = self._lambda_A * self.loss_func_rec_l1(x_y_x, x)
         loss_cycle_y = self._lambda_B * self.loss_func_rec_l1(y_x_y, y)
-        loss_id_x = self._lambda_id * F.mean_absolute_error(x, self.gen_f(x))
-        loss_id_y = self._lambda_id * F.mean_absolute_error(y, self.gen_g(y))
-        loss_gen = loss_gen_g_adv + loss_gen_f_adv + loss_cycle_x + \
-                   loss_cycle_y + loss_id_x + loss_id_y
+        loss_gen = loss_gen_g_adv + loss_gen_f_adv + loss_cycle_x + loss_cycle_y
+
+        if self._lambda_id > 0:
+            loss_id_x = self._lambda_id * F.mean_absolute_error(x,
+                                                                self.gen_f(x))
+            loss_id_y = self._lambda_id * F.mean_absolute_error(y,
+                                                                self.gen_g(y))
+            loss_gen = loss_gen + loss_id_x + loss_id_y
 
         self.gen_f.cleargrads()
         self.gen_g.cleargrads()
@@ -138,7 +142,9 @@ class Updater(chainer.training.StandardUpdater):
         chainer.report({'loss': loss_dis_y}, self.dis_y)
         chainer.report({'loss_cycle': loss_cycle_y}, self.gen_g)
         chainer.report({'loss_cycle': loss_cycle_x}, self.gen_f)
-        chainer.report({'loss_id': loss_id_y}, self.gen_g)
-        chainer.report({'loss_id': loss_id_x}, self.gen_f)
         chainer.report({'loss_gen': loss_gen_g_adv}, self.gen_g)
         chainer.report({'loss_gen': loss_gen_f_adv}, self.gen_f)
+
+        if self._lambda_id > 0:
+            chainer.report({'loss_id': loss_id_y}, self.gen_g)
+            chainer.report({'loss_id': loss_id_x}, self.gen_f)

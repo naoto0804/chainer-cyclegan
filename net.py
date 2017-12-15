@@ -18,10 +18,10 @@ class ResBlock(chainer.Chain):
                 self.norm0 = L.BatchNormalization(ch)
                 self.norm1 = L.BatchNormalization(ch)
             elif norm == 'instance':
-                self.norm0 = InstanceNormalization(ch, use_gamma=False,
-                                                   use_beta=False)
-                self.norm1 = InstanceNormalization(ch, use_gamma=False,
-                                                   use_beta=False)
+                self.norm0 = InstanceNormalization(ch, use_gamma=True,
+                                                   use_beta=True)
+                self.norm1 = InstanceNormalization(ch, use_gamma=True,
+                                                   use_beta=True)
 
     def __call__(self, x):
         h = self.c0(x)
@@ -54,11 +54,10 @@ class CBR(chainer.Chain):
             else:
                 self.c = L.Convolution2D(ch0, ch1, ksize, 1, pad, initialW=w)
             if self.use_norm and norm == 'batch':
-                self.norm = L.BatchNormalization(ch1, use_gamma=False,
-                                                 use_beta=False)
+                self.norm = L.BatchNormalization(ch1)
             elif self.use_norm and norm == 'instance':
-                self.norm = InstanceNormalization(ch1, use_gamma=False,
-                                                  use_beta=False)
+                self.norm = InstanceNormalization(ch1, use_gamma=True,
+                                                  use_beta=True)
 
     def __call__(self, x):
         if self.sample in ['down', 'none', 'none-9', 'none-7', 'none-5']:
