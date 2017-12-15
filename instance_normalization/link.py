@@ -53,7 +53,7 @@ class InstanceNormalization(link.Link):
         else:
             with cuda.get_device_from_id(self._device_id):
                 gamma = variable.Variable(self.xp.ones(
-                    self.avg_mean.shape, dtype=x.dtype))
+                    x.data.shape[1], dtype=x.dtype))
         if hasattr(self, 'beta'):
             beta = self.beta
         elif beta_ is not None:
@@ -61,7 +61,7 @@ class InstanceNormalization(link.Link):
         else:
             with cuda.get_device_from_id(self._device_id):
                 beta = variable.Variable(self.xp.zeros(
-                    self.avg_mean.shape, dtype=x.dtype))
+                    x.data.shape[1], dtype=x.dtype))
 
         decay = self.decay
         if (not configuration.config.train) and self.valid_test:
