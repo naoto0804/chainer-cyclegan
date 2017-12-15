@@ -185,8 +185,9 @@ def main():
     trainer.extend(extensions.snapshot_object(
         dis_y, 'dis_y{.updater.iteration}.npz'), trigger=model_save_interval)
 
-    log_keys = ['epoch', 'iteration', 'gen_g/loss_rec', 'gen_f/loss_rec',
-                'gen_g/loss_gen', 'gen_f/loss_gen', 'dis_x/loss', 'dis_y/loss']
+    log_keys = ['epoch', 'iteration', 'gen_g/loss_cycle', 'gen_f/loss_cycle',
+                'gen_g/loss_id', 'gen_f/loss_id', 'gen_g/loss_gen',
+                'gen_f/loss_gen', 'dis_x/loss', 'dis_y/loss']
     trainer.extend(
         extensions.LogReport(keys=log_keys, trigger=log_interval))
     trainer.extend(extensions.PrintReport(log_keys), trigger=log_interval)
@@ -195,8 +196,9 @@ def main():
     if extensions.PlotReport.available():
         trainer.extend(
             extensions.PlotReport(
-                ['gen_g/loss_rec', 'gen_f/loss_rec', 'gen_g/loss_gen',
-                 'gen_f/loss_gen', 'dis_x/loss', 'dis_y/loss'], 'iteration',
+                ['gen_g/loss_cycle', 'gen_f/loss_cycle', 'gen_g/loss_id',
+                 'gen_f/loss_id', 'gen_g/loss_gen', 'gen_f/loss_gen',
+                 'dis_x/loss', 'dis_y/loss'], 'iteration',
                 trigger=(100, 'iteration'), file_name='loss.png'))
 
     trainer.extend(
