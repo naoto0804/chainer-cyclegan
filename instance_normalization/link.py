@@ -16,7 +16,7 @@ class InstanceNormalization(link.Link):
     in generative models of what we call Style Transfer.
     """
 
-    def __init__(self, size, decay=0.9, eps=2e-5, dtype=numpy.float32,
+    def __init__(self, size, decay=0.9, eps=1e-5, dtype=numpy.float32,
                  valid_test=False, use_gamma=True, use_beta=True,
                  initial_gamma=None, initial_beta=None):
         super(InstanceNormalization, self).__init__()
