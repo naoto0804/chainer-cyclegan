@@ -28,14 +28,15 @@ def main():
     parser.add_argument('--vis_folder', '-e', default='visualization',
                         help='Directory to output the visualization result')
 
-    parser.add_argument('--eval_interval', type=int, default=1000,
-                        help='Interval of evaluating generator')
-
     parser.add_argument('--learning_rate_g', type=float, default=0.0002,
                         help='Learning rate for generator')
     parser.add_argument('--learning_rate_d', type=float, default=0.0002,
                         help='Learning rate for discriminator')
 
+    parser.add_argument('--gen_class', default='Generator',
+                        help='Default generator class')
+    parser.add_argument('--dis_class', default='Discriminator',
+                        help='Default discriminator class')
     parser.add_argument('--load_gen_f_model', default='',
                         help='load generator model')
     parser.add_argument('--load_gen_g_model', default='',
@@ -44,13 +45,8 @@ def main():
                         help='load discriminator model')
     parser.add_argument('--load_dis_y_model', default='',
                         help='load discriminator model')
-
-    parser.add_argument('--gen_class', default='Generator',
-                        help='Default generator class')
-    parser.add_argument('--dis_class', default='Discriminator',
-                        help='Default discriminator class')
     parser.add_argument('--norm', default='instance',
-                        help='normalization type. instance or batch')
+                        choices=['instance', 'batch'])
 
     parser.add_argument('--lambda_A', type=float, default=10.0,
                         help='weight for cycle loss (A -> B -> A)')
