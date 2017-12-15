@@ -1,8 +1,24 @@
+import functools
+
 import chainer
 import chainer.functions as F
 import chainer.links as L
 
 from instance_normalization import InstanceNormalization
+
+
+def get_norm_layer(norm='instance'):
+    # unchecked: init weight of bn
+    if norm == 'batch':
+        norm_layer = functools.partial(L.BatchNormalization, use_gamma=True,
+                                       use_beta=True)
+    elif norm == 'instance':
+        norm_layer = functools.partial(InstanceNormalization, use_gamma=False,
+                                       use_beta=False)
+    else:
+        raise NotImplementedError(
+            'normalization layer [%s] is not found' % norm)
+    return norm_layer
 
 
 class ResBlock(chainer.Chain):
@@ -13,15 +29,8 @@ class ResBlock(chainer.Chain):
         with self.init_scope():
             self.c0 = L.Convolution2D(ch, ch, 3, 1, 1, initialW=w)
             self.c1 = L.Convolution2D(ch, ch, 3, 1, 1, initialW=w)
-            if norm == 'batch':
-                # unchecked: init weight of bn
-                self.norm0 = L.BatchNormalization(ch)
-                self.norm1 = L.BatchNormalization(ch)
-            elif norm == 'instance':
-                self.norm0 = InstanceNormalization(ch, use_gamma=True,
-                                                   use_beta=True)
-                self.norm1 = InstanceNormalization(ch, use_gamma=True,
-                                                   use_beta=True)
+            self.norm0 = get_norm_layer(norm)(ch)
+            self.norm1 = get_norm_layer(norm)(ch)
 
     def __call__(self, x):
         h = self.c0(x)
@@ -53,11 +62,8 @@ class CBR(chainer.Chain):
                 self.c = L.Convolution2D(ch0, ch1, 5, 1, 2, initialW=w)
             else:
                 self.c = L.Convolution2D(ch0, ch1, ksize, 1, pad, initialW=w)
-            if self.use_norm and norm == 'batch':
-                self.norm = L.BatchNormalization(ch1)
-            elif self.use_norm and norm == 'instance':
-                self.norm = InstanceNormalization(ch1, use_gamma=True,
-                                                  use_beta=True)
+            if self.use_norm:
+                self.norm = get_norm_layer(norm)(ch1)
 
     def __call__(self, x):
         if self.sample in ['down', 'none', 'none-9', 'none-7', 'none-5']:
