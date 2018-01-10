@@ -67,4 +67,5 @@ if __name__ == '__main__':
             arr = resize(arr, (h, w))
             write_image(arr, path)
             cnt += 1
-            print(cnt)
+        print(cnt)
+
