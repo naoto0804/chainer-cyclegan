@@ -99,7 +99,7 @@ class Generator(chainer.Chain):
             setattr(self, 'c' + str(n_resblock + 5),
                     CBR(64, 32, norm=norm, sample='up'))
             setattr(self, 'c' + str(n_resblock + 6),
-                    CBR(32, 3, norm=norm, sample='none-7', activation=F.tanh))
+                    CBR(32, 3, norm=None, sample='none-7', activation=F.tanh))
 
     def __call__(self, x):
         h = self.c1(x)
